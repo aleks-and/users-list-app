@@ -10,7 +10,7 @@ import 'bulma/css/bulma.css';
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter basename="/users-list-app">
       <App />
     </BrowserRouter>
   </Provider>, 
