@@ -28,9 +28,12 @@ export const addUsers = users => ({
   payload: users,
 });
 
-export const changeUser = id => ({
+export const changeUser = (id, value) => ({
   type: ACTION_TYPES.EDIT_USER,
-  payload: id,
+  payload: {
+    id,
+    value,
+  },
 });
 
 export const removeUser = id => ({
@@ -65,12 +68,12 @@ export const deleteUser = (id) => {
   }
 };
 
-export const editUser = (id) => {
+export const editUser = (id, value) => {
   return dispatch => {
     return (
       fetch(`${API_URLS.BASE}${API_URLS.DELETE_USER}${id}`, {method: 'patch'})
         .then(() => (
-          dispatch(changeUser(id))
+          dispatch(changeUser(id, value))
         ))
     );
   }
@@ -114,7 +117,16 @@ function reducer(state = initialState, action = {}) {
     case ACTION_TYPES.EDIT_USER:
       return {
         ...state,
-        // EDIT
+        users: state.users.map(user => {
+          if (user.id === action.payload.id) {
+            return ({
+              ...user,
+              first_name: action.payload.value,
+            })
+          }
+
+          return user;
+        }),
       };
 
     default:

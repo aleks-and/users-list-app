@@ -1,5 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+
+import { editUser } from '../../store';
 
 class User extends React.Component {
   state = {
@@ -23,15 +26,22 @@ class User extends React.Component {
     });
   }
 
-  onKeyPressed = (event) => {
+  onKeyPressed = (event, id) => {
     if (event.key === "Escape" || event.key === "Esc") {
-      this.setState({
-        isUserEditing: false,
-      });
+      this.editUser(event, id);
     }
   }
 
-  editUser = () => {}
+  editUser = async (event, id) => {
+    event.preventDefault();
+    const { userNameValue } = this.state;
+    if (userNameValue.trim().length > 0) {
+      await this.props.editUser(id, userNameValue);
+    }
+    this.setState({
+      isUserEditing: false,
+    });
+  }
 
   render() {
     const {
@@ -57,14 +67,14 @@ class User extends React.Component {
             <div className="media-content content">
               {isUserEditing
                 ?
-                <form onSubmit={this.editUser}>
+                <form onSubmit={event => this.editUser(event, id)}>
                   <input
                     type="text"
                     className=""
                     value={userNameValue}
                     onChange={this.setNewValue}
-                    onBlur={this.editUser}
-                    onKeyDown={this.onKeyPressed}
+                    onBlur={event => this.editUser(event, id)}
+                    onKeyDown={event => this.onKeyPressed(event, id)}
                     autoFocus
                   />
                 </form>
@@ -95,4 +105,11 @@ class User extends React.Component {
   }
 }
 
-export default User;
+const mapDispatchToProps = dispatch => ({
+  editUser: (id, value) => dispatch(editUser(id, value)),
+});
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(User);
