@@ -71,7 +71,7 @@ export const deleteUser = (id) => {
 export const editUser = (id, value) => {
   return dispatch => {
     return (
-      fetch(`${API_URLS.BASE}${API_URLS.DELETE_USER}${id}`, {method: 'patch'})
+      fetch(`${API_URLS.BASE}${API_URLS.DELETE_USER}${id}`, {method: 'put'})
         .then(() => (
           dispatch(changeUser(id, value))
         ))
