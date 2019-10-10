@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { loadData } from '../../store';
-
+import { loadData, deleteUser } from '../../store';
 import User from '../User/User';
+
 import './UsersList.scss';
 
 class UsersList extends React.Component {
@@ -11,15 +11,23 @@ class UsersList extends React.Component {
     this.props.loadData();
   }
 
+  deleteUser = (id) => {
+    this.props.deleteUser(id);
+  }
+
   render() {
-    const { loadData, users, isLoading, isLoaded } = this.props;
+    const {
+      users, 
+      isLoading, 
+      isLoaded,
+    } = this.props;
 
     return (
       <div className="container has-text-centered users-list">
         {!isLoaded &&
           <button
             className="button is-dark is-large"
-            onClick={loadData}
+            onClick={this.loadData}
             disabled={isLoading}
           >
             Get users
@@ -28,7 +36,11 @@ class UsersList extends React.Component {
         {isLoaded &&
           <section>
             {users.map(user => (
-              <User user={user} key={user.id} />
+              <User
+                user={user} 
+                deleteUser={this.deleteUser} 
+                key={user.id} 
+              />
             ))}
           </section>
         }
@@ -45,6 +57,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   loadData: () => dispatch(loadData()),
+  deleteUser: (id) => dispatch(deleteUser(id)),
 });
 
 export default connect(

@@ -1,12 +1,23 @@
-import { createStore, applyMiddleware } from 'redux';
+import {
+  createStore,
+  applyMiddleware,
+  compose
+} from 'redux';
+
 import thunk from 'redux-thunk';
 
-const API_URL = 'https://reqres.in/api/users?delay=2';
+const API_URLS = {
+  BASE: 'https://reqres.in/api',
+  GET_USERS: '/users?delay=2',
+  DELETE_USER: '/users/',
+};
 
 const ACTION_TYPES = {
   START_LOADING: 'START_LOADING',
   HANDLE_SUCCESS: 'HANDLE_SUCCESS',
-}
+  DELETE_USER: 'DELETE_USER',
+  EDIT_USER: 'EDIT_USER',
+};
 
 export const startLoading = () => ({
   type: ACTION_TYPES.START_LOADING,
@@ -17,18 +28,50 @@ export const addUsers = users => ({
   payload: users,
 });
 
+export const changeUser = id => ({
+  type: ACTION_TYPES.EDIT_USER,
+  payload: id,
+});
+
+export const removeUser = id => ({
+  type: ACTION_TYPES.DELETE_USER,
+  payload: id,
+});
+
 export const loadData = () => {
   return dispatch => {
     dispatch(startLoading());
 
     return (
-      fetch(API_URL)
+      fetch(`${API_URLS.BASE}${API_URLS.GET_USERS}`)
         .then(response => (
           response.json()
         ))
-        .then((response) => {
+        .then(response => {
           dispatch(addUsers(response.data));
         })
+    );
+  }
+};
+
+export const deleteUser = (id) => {
+  return dispatch => {
+    return (
+      fetch(`${API_URLS.BASE}${API_URLS.DELETE_USER}${id}`, {method: 'delete'})
+        .then(() => (
+          dispatch(removeUser(id))
+        ))
+    );
+  }
+};
+
+export const editUser = (id) => {
+  return dispatch => {
+    return (
+      fetch(`${API_URLS.BASE}${API_URLS.DELETE_USER}${id}`, {method: 'patch'})
+        .then(() => (
+          dispatch(changeUser(id))
+        ))
     );
   }
 };
@@ -56,13 +99,34 @@ function reducer(state = initialState, action = {}) {
         isLoaded: true,
       };
 
+    case ACTION_TYPES.DELETE_USER:
+      return {
+        ...state,
+        users: state.users.reduce((acc, user) => {
+          if (user.id === action.payload) {
+            return [...acc];
+          }
+
+          return [...acc, user,];
+        }, []),
+      };
+
+    case ACTION_TYPES.EDIT_USER:
+      return {
+        ...state,
+        // EDIT
+      };
+
     default:
       return state;
   }
 }
 
+const composeEnhancers = (typeof window !== 'undefined'
+  && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
+
 export const store = createStore(
   reducer,
   initialState,
-  applyMiddleware(thunk)
+  composeEnhancers(applyMiddleware(thunk))
 );
