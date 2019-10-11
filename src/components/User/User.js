@@ -70,7 +70,7 @@ class User extends React.Component {
                 <form onSubmit={event => this.editUser(event, id)}>
                   <input
                     type="text"
-                    className=""
+                    className="input"
                     value={userNameValue}
                     onChange={this.setNewValue}
                     onBlur={event => this.editUser(event, id)}
